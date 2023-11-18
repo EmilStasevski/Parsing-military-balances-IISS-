@@ -1,0 +1,55 @@
+---
+title: "Check military balances parsing"
+author: "Staszewski"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE}
+library(dplyr)
+library(readxl)
+library(tidyverse)
+```
+
+
+### Загружаем балансы 
+
+```{r, warning=FALSE}
+balance_parsed = read_excel('~/parsing balances/res.xlsx')
+balance_manual = read_excel('~/Articles/data/IMDT.xlsx')
+balance_manual$year_deployer = paste(balance_manual$year, 
+                                     balance_manual$deployer,
+                                     sep='_'
+                                     )
+
+balance_manual =  balance_manual %>% filter((year > 2004) & (year < 2022) )
+```
+
+
+
+### Этап I проверка деплойров
+
+```{r}
+manually_year_ccode1 <- as.vector(unique(balance_manual$year_ccode1) )
+
+manually_year_deployer <- as.vector(unique(balance_manual$year_deployer) )
+
+parsed_year_ccode1 <- as.vector(unique(balance_parsed$year_ccode1) )
+
+parsed_year_deployer <- as.vector(unique(balance_parsed$year_deployer) )
+
+print(unique(setdiff(manually_year_ccode1, parsed_year_ccode1 ) ) )
+```
+
+
+```{r}
+print(unique(setdiff(manually_year_deployer, parsed_year_deployer ) ) )
+```
+
+
+
+### Этап II проверка стран, хостящих войск (receptors)
